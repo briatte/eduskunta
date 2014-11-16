@@ -97,7 +97,7 @@ for(ii in 35:36) {
   cat(network.size(n), "nodes")
   
   n %v% "url" = as.character(s[ network.vertex.names(n), "url" ])
-  n %v% "sex" = NA # FIX: as.character(s[ network.vertex.names(n), "sex" ])
+  n %v% "sex" = as.character(s[ network.vertex.names(n), "sex" ])
   n %v% "born" = as.numeric(s[ network.vertex.names(n), "born" ])
   n %v% "party" = s[ network.vertex.names(n), "party" ]
   n %v% "nyears" = s[ network.vertex.names(n), "nyears" ]
