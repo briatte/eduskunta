@@ -62,7 +62,7 @@ for(ii in 35:36) {
     w = unlist(strsplit(d, ";"))
     d = s$name[ s$name %in% w ]
     
-    d = subset(expand.grid(d, d), Var1 != Var2)
+    d = subset(expand.grid(Var1 = d[1], Var2 = d[-1], stringsAsFactors = FALSE), Var1 != Var2)
     d = unique(apply(d, 1, function(x) paste0(sort(x), collapse = "_")))
     
     if(length(d))
@@ -97,7 +97,7 @@ for(ii in 35:36) {
   cat(network.size(n), "nodes")
   
   n %v% "url" = as.character(s[ network.vertex.names(n), "url" ])
-  # n %v% "sex" = as.character(s[ network.vertex.names(n), "sex" ])
+  n %v% "sex" = NA # FIX: as.character(s[ network.vertex.names(n), "sex" ])
   n %v% "born" = as.numeric(s[ network.vertex.names(n), "born" ])
   n %v% "party" = s[ network.vertex.names(n), "party" ]
   n %v% "nyears" = s[ network.vertex.names(n), "nyears" ]
