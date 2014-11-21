@@ -41,8 +41,8 @@ source("data.r") # scrape bills and sponsors
 
 # last two legislatures
 b$legislature = NA
-b$legislature[ b$year >= 2011 ] = 36 # excludes 2011
-b$legislature[ b$year < 2011 ] = 35 # excludes 2011
+b$legislature[ b$year >= 2011 ] = 36 # includes 2011 (election in April)
+b$legislature[ b$year < 2011 ] = 35  # excludes 2011
 
 # sponsor unique ids are names
 rownames(s) = s$name
