@@ -26,13 +26,13 @@ colors = c(
   "VAS"  = "#E41A1C", # Vasemmistoliitto                -- red
   "PS"   = "#053061", # Perussuomalaiset                -- dark blue
   "VIHR" = "#B3DE69", # Vihreä liitto                   -- light green
-  "SD"   = "#FB8072", # Sosialidemokraattinen Puolue    -- light red
+  "SD"   = "#F781BF", # Sosialidemokraattinen Puolue    -- pink
   # Centre
   "KESK" = "#4DAF4A", # Suomen Keskusta                 -- green
   "R"    = "#FFFF33", # Ruotsalainen kansanpuolue (RKP) -- yellow
   # Right
   "KD"   = "#FF7F00", # Kristillisdemokraatit           -- orange
-  "KOK"  = "#1B9E77", # Kansallinen Kokoomus            -- teal
+  "KOK"  = "#01665E", # Kansallinen Kokoomus            -- dark green/teal
   # Other
   "M11"  = "#80B1D3"  # Muutos 2011                     -- light blue
 )
