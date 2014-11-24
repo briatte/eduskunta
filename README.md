@@ -1,4 +1,5 @@
-A (draft) scraper for bills from the [Finnish Parliament](http://www.eduskunta.fi/) that builds their [cosponsorship networks](http://jhfowler.ucsd.edu/cosponsorship.htm). Replicate by running `make.r` in R, or see the [interactive demo][demo].
+- [interactive demo](http://briatte.org/eduskunta)
+- [network plots](http://briatte.org/eduskunta/plots.html)
 
 For related work, see the [`finpar`](https://github.com/rOpenGov/finpar) package.
 
