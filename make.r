@@ -202,9 +202,11 @@ for(ii in 35:36) {
     print(g)
     
     ggsave(paste0("plots/net_fi_", ii, ".pdf"), 
-           g + theme(legend.key = element_blank()), width = 10, height = 9)
+           g + theme(legend.key = element_blank()),
+           width = 10, height = 9)
     ggsave(paste0("plots/net_fi_", ii, ".jpg"),
-           g + theme(legend.position = "none"), width = 9, height = 9)
+           g + theme(legend.position = "none"),
+           width = 9, height = 9, dpi = 150)
     
   }
     
