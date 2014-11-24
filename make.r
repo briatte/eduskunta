@@ -18,20 +18,24 @@ dir.create("data", showWarnings = FALSE)
 dir.create("photos", showWarnings = FALSE)
 dir.create("plots", showWarnings = FALSE)
 
+# listing only parties represented in the cosponsorship data
 # dput(unique(subset(s, name %in% a)$party))
 colors = c(
-  "vr" = "#AAAAAA",    # Vasenryhmä, Mustajärvi + Yrttiaho breakawy from Left Alliance -- light grey
-  "vihr" = "#4DAF4A",  # Vihreä liitto, Green League, ecologist -- light green
-  "vas" = "#E41A1C",   # Vasemmistoliitto, Left Alliance, left, red/green
-  "sd" = "#FB8072",    # Suomen Sosialidemokraattinen Puolue, left -- light red
-  "kesk" =  "#1B9E77", # Suomen Keskusta, centre, green -- teal
-  "r" = "#FFFF33",     # Ruotsalainen kansanpuolue (RKP), Swedes, centre -- yellow
-  "kd" = "#FF7F00",    # Kristillisdemokraatit, Chr-Dems, blue/orange -- orange
-  "kok" = "#80B1D3",   # Kansallinen Kokoomus, National Coalition Party, CR, blue/grey -- light blue
-  "m11" = "#984EA3",   # Muutos 2011, Change 2011, joined by True Finns transfuge -- purple
-  "ps" = "#A65628"     # Perussuomalaiset, True Finns, far-right, brown
+  # Left
+  "VR"   = "#AAAAAA", # Vasenryhmä                      -- light grey
+  "VAS"  = "#E41A1C", # Vasemmistoliitto                -- red
+  "PS"   = "#053061", # Perussuomalaiset                -- dark blue
+  "VIHR" = "#B3DE69", # Vihreä liitto                   -- light green
+  "SD"   = "#FB8072", # Sosialidemokraattinen Puolue    -- light red
+  # Centre
+  "KESK" = "#4DAF4A", # Suomen Keskusta                 -- green
+  "R"    = "#FFFF33", # Ruotsalainen kansanpuolue (RKP) -- yellow
+  # Right
+  "KD"   = "#FF7F00", # Kristillisdemokraatit           -- orange
+  "KOK"  = "#1B9E77", # Kansallinen Kokoomus            -- teal
+  # Other
+  "M11"  = "#80B1D3"  # Muutos 2011                     -- light blue
 )
-
 order = names(colors)
 
 plot = TRUE
@@ -96,10 +100,11 @@ for(ii in 35:36) {
   
   cat(network.size(n), "nodes")
   
-  n %v% "url" = as.character(s[ network.vertex.names(n), "url" ])
+  n %v% "url" = as.character(s[ network.vertex.names(n), "profile_url" ])
   n %v% "sex" = as.character(s[ network.vertex.names(n), "sex" ])
   n %v% "born" = as.numeric(s[ network.vertex.names(n), "born" ])
   n %v% "party" = s[ network.vertex.names(n), "party" ]
+  n %v% "partyname" = s[ network.vertex.names(n), "partyname" ]
   n %v% "nyears" = s[ network.vertex.names(n), "nyears" ]
   # n %v% "constituency" = s[ network.vertex.names(n), "constituency" ]
   n %v% "photo" = as.character(s[ network.vertex.names(n), "photo" ])
@@ -119,8 +124,7 @@ for(ii in 35:36) {
   E(nn)$weight = edges[, 3]
   
   i = s[ V(nn)$name, "party" ]
-  # ignoring: independents, minorities
-  i[ i %in% c("m11", "vr") ] = NA
+  i[ i %in% c("M11", "VR") ] = NA # ignoring: 'groups' of one or two MPs
   
   nn = nn - which(is.na(i))
   i = as.numeric(factor(i[ !is.na(i) ]))
@@ -217,12 +221,9 @@ for(ii in 35:36) {
                 description = paste(mode, "placement", nrow(data), "bills"),
                 keywords = "parliament, finland")
     
-    node.att = data.frame(url = gsub("/triphome/bin/hx5000\\.sh\\?$\\{APPL\\}=hetekaue&$\\{BASE\\}=hetekaue&$\\{THWIDS\\}=", "", 
-                                     gsub("&", "&amp;", n %v% "url")), # protected
-                          party = n %v% "party",
+    node.att = data.frame(url = gsub("&", "&amp;", n %v% "url"), # protected
+                          party = n %v% "partyname",
                           bills = n %v% "n_bills",
-                          # extra attributes
-                          # constituency = n %v% "constituency",
                           distance = round(n %v% "distance", 1),
                           photo = gsub("photos/", "", n %v% "photo"),
                           stringsAsFactors = FALSE)

@@ -195,26 +195,41 @@ n$party[ is.na(n$party) ] = "?"
 
 # party abbreviations
 
-n$party[ grepl("Vihreä", n$party) ] = "vihr" # "Vihreä", # Vihreä liitto, Green League, ecologist, light green
-n$party[ grepl("Vasemmistoliiton", n$party) ] = "vas" # Vasemmistoliitto, Left Alliance, left, red/green; also [vr]
-n$party[ grepl("Sosialidemokraattinen", n$party) ] = "sd" # Suomen Sosialidemokraattinen Puolue, left, red
-n$party[ grepl("Keskustan", n$party) ] = "kesk" # Suomen Keskusta, centre, green
-n$party[ grepl("Ruotsalainen", n$party) ] = "r" # Ruotsalainen kansanpuolue (RKP), Swedes, centre, yellow
-n$party[ grepl("Kristillisdemokraattinen|Kristillisen", n$party) ] = "kd" # Kristillisdemokraatit, Chr-Dems, blue/orange
-n$party[ grepl("Kansallisen kokoomuksen", n$party) ] = "kok" # Kansallinen Kokoomus, National Coalition Party, blue/grey
-n$party[ grepl("Muutos 2011", n$party) ] = "m11" # Muutos 2011, Change 2011, joined by True Finns transfuge
-n$party[ grepl("Perussuomalaisten", n$party) ] = "ps" # Perussuomalaiset, True Finns, far-right, blue/gold
-n$party[ grepl("Vasenryhmä", n$party) ] = "vr" # Mustajärvi + Yrttiaho breakawy from Left Alliance
+n$party[ grepl("Vihreä", n$party) ] = "vihr" # Vihreä liitto
+n$party[ grepl("Vasemmistoliiton", n$party) ] = "vas" # Vasemmistoliitto
+n$party[ grepl("Sosialidemokraattinen", n$party) ] = "sd" # Suomen Sosialidemokraattinen Puolue
+n$party[ grepl("Keskustan", n$party) ] = "kesk" # Suomen Keskusta
+n$party[ grepl("Ruotsalainen", n$party) ] = "r" # Ruotsalainen kansanpuolue (RKP)
+n$party[ grepl("Kristillisdemokraattinen|Kristillisen", n$party) ] = "kd" # Kristillisdemokraatit, Chr-Dems
+n$party[ grepl("Kansallisen kokoomuksen", n$party) ] = "kok" # Kansallinen Kokoomus
+n$party[ grepl("Muutos 2011", n$party) ] = "m11" # Muutos 2011
+n$party[ grepl("Perussuomalaisten", n$party) ] = "ps" # Perussuomalaiset
+n$party[ grepl("Vasenryhmä", n$party) ] = "vr" # Vasenryhmä
 
 # parties below use unofficial abbreviations
 
 # Suomen Kansan Demokraattinen Liitto (SKDL), Finnish People's Democratic League, far-left, 1944-1990, red
-n$party[ grepl("kansan demokraattisen liiton", n$party) ] = "skdl"
+n$party[ grepl("kansan demokraattisen liiton", n$party) ] = "kdl"
 
 # Suomen Maaseudun Puolue (SMP), right, 1959-1995, dark blue
-n$party[ grepl("maaseudun puolueen", n$party) ] = "smp"
+n$party[ grepl("maaseudun puolueen", n$party) ] = "mp"
 
-table(n$party, exclude = NULL)
+n$partyname = NA
+n$partyname[ n$party == "kd" ] = "Kristillisdemokraatit"
+n$partyname[ n$party == "kesk" ] = "Keskusta"
+n$partyname[ n$party == "kok" ] = "Kansallinen Kokoomus"
+n$partyname[ n$party == "m11" ] = "Muutos 2011"
+n$partyname[ n$party == "ps" ] = "Perussuomalaiset"
+n$partyname[ n$party == "r" ] = "Ruotsalainen kansanpuolue"
+n$partyname[ n$party == "sd" ] = "Sosialidemokraattinen Puolue"
+n$partyname[ n$party == "kdl" ] = "Kansan Demokraattinen Liitto"
+n$partyname[ n$party == "mp" ] = "Maaseudun Puolue"
+n$partyname[ n$party == "vas" ] = "Vasemmistoliitto"
+n$partyname[ n$party == "vihr" ] = "Vihreä liitto"
+n$partyname[ n$party == "vr" ] = "Vasenryhmä"
+
+table(n$partyname, exclude = NULL)
+n$party = toupper(n$party)
 
 # convert mandates to n(years)
 
