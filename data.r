@@ -10,11 +10,18 @@ if(!file.exists(bills)) {
   for(y in 2014:2009) {
     
     cat("Adding year", y)
-    h = GET(paste0("http://www.eduskunta.fi/triphome/bin/thw.cgi/trip/?${BASE}=veps7099&${CCL}=define+merge&${CCL}=define+thesa=vepstesa&${CCL}=define+view+saadkok=saadk,kv_saadk,sopimussarja,kv_sopimussarja&${FREETEXT}=tunniste=$+AND+tunniste=LA+and+vpvuosi=", y, "&${savehtml}=/thwfakta/vpasia/vex/vex.htm&${TRIPSHOW}=html=vex/vex4050+format=vex4050&${MAXPAGE}=501&${SORT}=LAJIT1,LAJIT2+DESC&${COMBOT}=0,2,0#alkukohta"))
+    file = paste0("raw/bills-", y, ".html")
+    
+    if(!file.exists(file))
+      download.file(paste0("http://www.eduskunta.fi/triphome/bin/thw.cgi/trip/?${BASE}=veps7099&${CCL}=define+merge&${CCL}=define+thesa=vepstesa&${CCL}=define+view+saadkok=saadk,kv_saadk,sopimussarja,kv_sopimussarja&${FREETEXT}=tunniste=$+AND+tunniste=LA+and+vpvuosi=", y, "&${savehtml}=/thwfakta/vpasia/vex/vex.htm&${TRIPSHOW}=html=vex/vex4050+format=vex4050&${MAXPAGE}=501&${SORT}=LAJIT1,LAJIT2+DESC&${COMBOT}=0,2,0#alkukohta"),
+                    file, quiet = TRUE, mode = "wb")
+    
+    h = htmlParse(file)
     b = rbind(b, data.frame(
       year = y,
-      url = xpathSApply(content(h), "//a[contains(@href, '{KEY}=LA+')]/@href"),
+      url = xpathSApply(h, "//a[contains(@href, '{KEY}=LA+')]/@href"),
       stringsAsFactors = FALSE))
+
     cat(":", sprintf("%4.0f", nrow(b)), "total bills\n")
     
   }
@@ -103,9 +110,9 @@ if(!file.exists(sponsors)) {
     h = htmlParse(paste0("http://www.eduskunta.fi/triphome/bin/thw/trip/?${MAXPAGE}=101&${APPL}=hetekaue&${BASE}=hetekaue&${HTML}=hex/hx4600&${THWIDS}=", 100 * i, ".18/1416059238_25311&${HILITE}=0#alkukohta"), encoding = "UTF-8")
     url = xpathSApply(h, "//a[contains(@href, 'hxnosynk')]/@href")
     name = xpathSApply(h, "//a[contains(@href, 'hxnosynk')]", xmlValue)
-    name = scrubber(gsub("&nbsp", "", name))
+    name = str_clean(gsub("&nbsp", "", name))
     year = xpathSApply(h, "//table[2]/tr/td[2]", xmlValue)
-    year = scrubber(year[-1])
+    year = str_clean(year[-1])
     s = rbind(s, data.frame(url, name, year, stringsAsFactors = FALSE))
     cat(":", nrow(s), "total MPs\n")
     
@@ -157,7 +164,7 @@ for(i in rev(l)) {
   } else {
     
     h = htmlParse(f, encoding = "UTF-8")
-    name = scrubber(xpathSApply(h, "//b[1]", xmlValue))
+    name = str_clean(xpathSApply(h, "//b[1]", xmlValue))
     mandate = xpathSApply(h, "//b[4]", xmlValue)
     
     party = xpathSApply(h, "//a[contains(@href, 'ekrtunnus')]", xmlValue)
@@ -165,7 +172,7 @@ for(i in rev(l)) {
     party = party[ party_length ]
     
     # dirtier method
-    # party = scrubber(xpathSApply(h, "//font[contains(text(), 'Eduskuntaryhm')]/../../..", xmlValue))
+    # party = str_clean(xpathSApply(h, "//font[contains(text(), 'Eduskuntaryhm')]/../../..", xmlValue))
     
     if(!length(party))
       party = NA
@@ -191,7 +198,8 @@ table(a[ !a %in% n$name ])
 table(n$party_length) # ~ 30 fixes to perform: party missing or more than one party
 n$party[ is.na(n$party) ] = "?"
 
-# n$party[ n$name == "" ] = "Liberaalisen kansanpuolueen eduskuntaryhmä"
+# the unidentified parties, e.g. "Liberaalisen kansanpuolueen eduskuntaryhmä",
+# are not found in the bill sponsors of legislatures 35-36; no need to fix
 
 # party abbreviations
 
@@ -231,17 +239,17 @@ n$partyname[ n$party == "vr" ] = "Vasenryhmä"
 table(n$partyname, exclude = NULL)
 n$party = toupper(n$party)
 
-# convert mandates to n(years)
-
-n$nyears = sapply(n$mandate, function(x) {
-  y = scrubber(unlist(strsplit(x, ",")))
+# convert mandates years
+n$mandate = sapply(n$mandate, function(x) {
+  y = str_clean(unlist(strsplit(x, ",")))
   y[ grepl("-$", y) ] = paste0(y[ grepl("-$", y) ], "2014")
   y = sapply(y, function(x) {
     x = unlist(str_extract_all(x, "[0-9]{4}"))
     x = as.numeric(x)
-    return(max(x) - min(x))
+    return(paste0(seq(x[1], x[2]), collapse = ";"))
   })
-  return(sum(y))
+  y = sort(unique(unlist(strsplit(y, ";"))))
+  return(paste0(sort(y), collapse = ";"))
 })
 
 n$sex = NA
@@ -267,7 +275,7 @@ if(!file.exists("data/sponsors.csv")) {
 l = s$photo_url[ s$name %in% a & is.na(s$photo) ]
 for(i in rev(l)) {
   
-  cat(sprintf("%5.0f", which(l == i)))
+  cat("Checking photo", sprintf("%5.0f", which(l == i)))
   h = htmlParse(paste0(root, gsub("hx5000", "hx5100", i)))
   p = xpathSApply(h, "//img[contains(@src, 'jpg')]/@src")
   f = gsub("/fakta/edustaja/kuvat", "photos", p)
@@ -290,5 +298,16 @@ for(i in rev(l)) {
 }
 
 write.csv(s, "data/sponsors.csv", row.names = FALSE)
+
+# last two legislatures
+b$legislature = NA
+b$legislature[ b$year >= 2011 ] = 36 # includes 2011 (election in April)
+b$legislature[ b$year < 2011 ] = 35  # excludes 2011
+
+# listing only parties represented in the cosponsorship data
+# dput(unique(subset(s, name %in% a)$party))
+
+# sponsor unique ids are names
+rownames(s) = s$name
 
 # job's done
