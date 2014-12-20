@@ -23,7 +23,7 @@ for(ii in 35:36) {
   # directed edge list
   #
   
-  edges = rbind.fill(lapply(data$authors, function(d) {
+  edges = rbind_all(lapply(data$authors, function(d) {
     
     w = unlist(strsplit(d, ";"))
     

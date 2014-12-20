@@ -1,6 +1,6 @@
 # data
 
-library(plyr)
+library(dplyr)
 library(stringr)
 library(XML)
 
