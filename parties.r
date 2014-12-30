@@ -16,8 +16,8 @@ colors = c(
 # ParlGov Left/Right scores
 
 scores = c(
-  "VR"   = 2.3,
-  "VAS"  = 2.3,
+  "VR"   = 2.2,
+  "VAS"  = 2.2,
   "VIHR" = 3.6,
   "SD"   = 3.6,
   "KESK" = 5.8,
