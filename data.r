@@ -253,9 +253,10 @@ n$mandate = sapply(n$mandate, function(x) {
 })
 
 n$sex = NA
-n$sex[ grepl("^(Aila|Aino-Kaisa|Ann(a|e|i)|Anu|Arja|Astrid|Christina|Eeva|Eila|Eli(na|sabeth)|Elsi|Hanna|He(idi|li|nna)|Ilkka|Inkeri|Ja(ana|nina|nne)|Johanna|Jutta|Katja|Katri|Kirsi|Kris(ta|tiina)|Laila|Lea |Leena|Lenita|Liisa|Lyly|Ma(arit|ri(a)? |rja(ana)?|rjo)|Merikukka|Merja|Miapetra|Mika |Mikaela)|Mi(nna|rja)|Outi|Päivi|Paul(a|i|iina) |Pia |Pirkko|Raija|Rakel|Riitta|Ritva|Saara|Sann(a|i)|Sari|Satu|Silvia|Sinikka|Sirkka|Sirpa|Sofia|Suna|Susanna|Ta(n|r)ja|Terhi|Tu(ija|ula)|Tuulikki|Tytti|Ulla", n$name) ] = "F"
-n$sex[ grepl("^(Alexander|An(ss|tt)i|Ari|Arto|Ben|Bjarne|Eero|Erkki|Es(a|ko)|Håkan|Hann(es|u)|Harri|Heikki|Ismo|Ja(akko|cob|mes|n(i)? |ri)|Johannes|Jörn|Jou(ko|ni)|Juh(a|o) |Ju(kka|ssi)|Jyrki|Kaj|Kalle|Kari |Kauko|Kimmo|Klaus|Kyösti|Lars|Lasse|Lauri|Mark(ku|o|us)|Martti|Mat(s|ti)|Mauri|Mikael|Timo)|Mikko|Oiva|Olli|Oras|Osmo|Paavo|Pekka|Pe(n|r)tti|Peter|Petri|Petteri|Pietari|Raimo|Reijo|Risto|Sampsa|Sauli|Seppo|Simo|Sinuhe|Stefan|Tapani|Tero|Teuvo|Thomas|Timo|Toimi|Tom |Tommy|Tuomo|Unto|Valto|Veijo|Vesa-|Ville", n$name) ] = "M"
-n$name[ !n$sex %in% c("F", "M") ]
+# checked: no overlap in regex, covers all sponsors of legislatures 35-36 (not all MPs, though)
+n$sex[ grepl("^(Aila|Aino-Kaisa|Ann(a|e|i)|Anu|Arja|Astrid|Christina|Eeva|Eila|Eli(na|sabeth)|Elsi|Hanna|He(idi|li|nna)|Ilkka|Inkeri|Ja(ana|nina|nne)|Johanna|Jutta|Katja|Katri|Kirsi|Kris(ta|tiina)|Laila|Lea\\s|Leena|Lenita|Liisa|Lyly|Ma(arit|ri(a)?\\s|rja(ana)?|rjo)|Merikukka|Merja|Miapetra|Mika\\s|Mikaela|Mi(nna|rja)|Outi|Päivi|Paul(a|i|iina)\\s|Pia\\s|Pirkko|Raija|Rakel|Riitta|Ritva|Saara|Sann(a|i)|Sari|Satu|Silvia|Sinikka|Sirkka|Sirpa|Sofia|Suna|Susanna|Ta(n|r)ja|Terhi|Tu(ija|ula)|Tuulikki|Tytti|Ulla)", n$name) ] = "F"
+n$sex[ grepl("^(Alexander|An(ss|tt)i|Ari|Arto|Ben|Bjarne|Eero|Erkki|Es(a|ko)|Håkan|Hann(es|u)|Harr(i|y)|Heikki|Ismo|Ja(akko|cob|mes|n(i)?\\s|ri)|Johannes|Jörn|Jou(ko|ni)|Juh(a|o)\\s|Ju(kka|ssi)|Jyrki|Kaj|Kalle|Kari\\s|Kauko|Kimmo|Klaus|Kyösti|Lars|Lasse|Lauri|Mark(ku|o|us)|Martti|Mat(s|ti)|Mauri|Mikael\\s|Timo|Mikko|Oiva|Olli|Oras|Osmo|Paavo|Pekka|Pe(n|r)tti|Peter|Petri|Petteri|Pietari|Raimo|Reijo|Risto|Sampsa|Sauli|Seppo|Simo|Sinuhe|Stefan|Tapani|Tero|Teuvo|Thomas|Timo|Toimi|Tom\\s|Tommy|Tuomo|Unto|Valto|Veijo|Vesa-|Ville)", n$name) ] = "M"
+table(n$name[ !n$sex %in% c("F", "M") ])
 
 # merge sponsor URL dataset to details
 s = merge(s, n, by = "profile_url")
