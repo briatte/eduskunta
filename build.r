@@ -107,7 +107,7 @@ for(ii in 35:36) {
     sum(unlist(strsplit(x, ";")) <= ifelse(leg == 35, 2007, 2011))
   })
   n %v% "nyears" = as.numeric(s[ network.vertex.names(n), "nyears" ])
-  # n %v% "constituency" = s[ network.vertex.names(n), "constituency" ]
+  n %v% "constituency" = as.character(s[ network.vertex.names(n), "constituency" ])
   n %v% "photo" = as.character(gsub("photos/", "", s[ network.vertex.names(n), "photo" ]))
 
   set.edge.attribute(n, "source", as.character(edges[, 1])) # cosponsor
@@ -158,7 +158,7 @@ for(ii in 35:36) {
   #
   
   if(gexf)
-    get_gexf(paste0("net_fi", ii), n, meta, mode, colors)
+    get_gexf(paste0("net_fi", ii), n, meta, mode, colors, extra = "constituency")
   
 }
 

@@ -29,7 +29,8 @@ The `build.r` script then assembles the edge lists and plots the networks, with 
 - `url` -- alternative profile URL (see below)
 - `year` -- year of entry in parliament
 - `photo_url` -- photo URL
-- `name` -- sponsor name (same as in bills data)
+- `name` -- sponsor name
+- `name_full` -- sponsor full name (same as in bills data)
 - `born` -- year of birth
 - `party` -- political party, abbreviated
 - `partyname` -- political party, full name
@@ -39,6 +40,13 @@ The `build.r` script then assembles the edge lists and plots the networks, with 
 - `photo` -- photo URL, simplified to its filename
 
 The Eduskunta website uses a _very_ strange URL system: two URLs are necessary to scrape the sponsors, which explains the four different URL variables (two for the sponsor profile, one for the original photo URL and one for the shortened version).
+
+If the URL at [line 110]() in `data.r` fails to work (which is almost certainly going to be the case):
+
+- visit [this index page](http://www.eduskunta.fi/thwfakta/hetekau/hex/hxent.htm)
+- extract the string stored into the `THWIDS` parameter when clicking 'Next page' (_Seuraava_ at the bottom-right of the page; copy the URL to the clipboard to view it)
+- remove the part before the first period, which should be `100`
+- replace the string `.21/1421346561_16245` on line 110 with the new string
 
 # CREDITS
 

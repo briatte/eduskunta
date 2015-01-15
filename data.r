@@ -107,7 +107,7 @@ if(!file.exists(sponsors)) {
   for(i in 24:0) {
     
     cat(sprintf("%5.0f", i))
-    h = htmlParse(paste0("http://www.eduskunta.fi/triphome/bin/thw/trip/?${MAXPAGE}=101&${APPL}=hetekaue&${BASE}=hetekaue&${HTML}=hex/hx4600&${THWIDS}=", 100 * i, ".18/1416059238_25311&${HILITE}=0#alkukohta"), encoding = "UTF-8")
+    h = htmlParse(paste0("http://www.eduskunta.fi/triphome/bin/thw/trip/?${MAXPAGE}=101&${APPL}=hetekaue&${BASE}=hetekaue&${HTML}=hex/hx4600&${THWIDS}=", 100 * i, ".21/1421346561_16245&${HILITE}=0#alkukohta"), encoding = "UTF-8")
     url = xpathSApply(h, "//a[contains(@href, 'hxnosynk')]/@href")
     name = xpathSApply(h, "//a[contains(@href, 'hxnosynk')]", xmlValue)
     name = str_clean(gsub("&nbsp", "", name))
@@ -167,6 +167,10 @@ for(i in rev(l)) {
     name = str_clean(xpathSApply(h, "//b[1]", xmlValue))
     mandate = xpathSApply(h, "//b[4]", xmlValue)
     
+    constituency = xpathSApply(h, "//font[contains(text(), 'Vaalipiiri')]/../../following-sibling::td//li", 
+                               xmlValue)
+    constituency = gsub("(.*)(\\svaalipiiri)(.*)", "\\1\\2", constituency[1])
+    
     party = xpathSApply(h, "//a[contains(@href, 'ekrtunnus')]", xmlValue)
     party_length = length(party)
     party = party[ party_length ]
@@ -182,11 +186,19 @@ for(i in rev(l)) {
     
     cat(":", name, "\n")
     
-    n = rbind(n, data.frame(profile_url = i, name, born, party, party_length, mandate, stringsAsFactors = FALSE))
+    n = rbind(n, data.frame(profile_url = i, name, born, party, party_length, 
+                            constituency, mandate, stringsAsFactors = FALSE))
     
   }
   
 }
+
+# convert constituencies to Wikipedia Suomi
+n$constituency = gsub("\\s", "_", n$constituency)
+n$constituency = gsub("_(eteläinen|läänin|kaupungin|pohjoinen)", "", n$constituency)
+n$constituency[ n$constituency == "Turun_vaalipiiri" ] = "Varsinais-Suomen_vaalipiiri"
+n$constituency[ n$constituency == "Mikkelin_vaalipiiri" ] = "Etelä-Savon_vaalipiiri"
+n$constituency[ n$constituency == "Kuopion_vaalipiiri" ] = "Pohjois-Savon_vaalipiiri"
 
 # all sponsors should be matched
 
@@ -259,6 +271,7 @@ n$sex[ grepl("^(Alexander|An(ss|tt)i|Ari|Arto|Ben|Bjarne|Eero|Erkki|Es(a|ko)|Hå
 table(n$name[ !n$sex %in% c("F", "M") ])
 
 # merge sponsor URL dataset to details
+names(s)[ which(names(s) == "name") ] = "name_full"
 s = merge(s, n, by = "profile_url")
 
 if(!file.exists("data/sponsors.csv")) {
@@ -273,7 +286,7 @@ if(!file.exists("data/sponsors.csv")) {
 }
 
 # download photos (sponsors only; rerun to solve network errors)
-l = s$photo_url[ s$name %in% a & is.na(s$photo) ]
+l = unique(s$photo_url[ s$name %in% a & is.na(s$photo) ])
 for(i in rev(l)) {
   
   cat("Checking photo", sprintf("%5.0f", which(l == i)))
@@ -282,7 +295,7 @@ for(i in rev(l)) {
   f = gsub("/fakta/edustaja/kuvat", "photos", p)
   
   if(!file.exists(f))
-    download.file(paste0(root, p), f, quiet = TRUE, mode = "wb")
+    try(download.file(paste0(root, p), f, quiet = TRUE, mode = "wb"), silent = TRUE)
   
   if(!file.info(f)$size) {
     
@@ -307,6 +320,9 @@ b$legislature[ b$year < 2011 ] = 35  # excludes 2011
 
 # listing only parties represented in the cosponsorship data
 # dput(unique(subset(s, name %in% a)$party))
+
+# comment out if there are no duplicated MPs due to profile_url errors
+s = s[ -which(duplicated(s$profile_url)), ]
 
 # sponsor unique ids are names
 rownames(s) = s$name
