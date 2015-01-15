@@ -169,6 +169,7 @@ for(i in rev(l)) {
     
     constituency = xpathSApply(h, "//font[contains(text(), 'Vaalipiiri')]/../../following-sibling::td//li", 
                                xmlValue)
+    constituency_length = length(constituency)
     constituency = gsub("(.*)(\\svaalipiiri)(.*)", "\\1\\2", constituency[1])
     
     party = xpathSApply(h, "//a[contains(@href, 'ekrtunnus')]", xmlValue)
@@ -187,11 +188,14 @@ for(i in rev(l)) {
     cat(":", name, "\n")
     
     n = rbind(n, data.frame(profile_url = i, name, born, party, party_length, 
-                            constituency, mandate, stringsAsFactors = FALSE))
+                            constituency, constituency_length, mandate,
+                            stringsAsFactors = FALSE))
     
   }
   
 }
+
+table(n$constituency_length) # ~ 240 fixes needed, multiple constituencies
 
 # convert constituencies to Wikipedia Suomi
 n$constituency = gsub("\\s", "_", n$constituency)
