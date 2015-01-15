@@ -170,7 +170,7 @@ for(i in rev(l)) {
     constituency = xpathSApply(h, "//font[contains(text(), 'Vaalipiiri')]/../../following-sibling::td//li", 
                                xmlValue)
     constituency_length = length(constituency)
-    constituency = gsub("(.*)(\\svaalipiiri)(.*)", "\\1\\2", constituency[1])
+    constituency = gsub("(.*)(\\svaalipiiri)(.*)", "\\1\\2", constituency[ length(constituency) ])
     
     party = xpathSApply(h, "//a[contains(@href, 'ekrtunnus')]", xmlValue)
     party_length = length(party)
