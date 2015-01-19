@@ -1,7 +1,7 @@
 meta = c("Finland", "Eduskunta")
 mode = "fruchtermanreingold"
 
-for(ii in 35:36) {
+for(ii in unique(b$legislature)) {
   
   cat("Legislature", ii)
   leg = substr(ii, 1, 4)
@@ -104,11 +104,14 @@ for(ii in 35:36) {
   n %v% "partyname" = as.character(s[ network.vertex.names(n), "partyname" ])
   n %v% "lr" = as.numeric(scores[ n %v% "party" ])
   s$nyears = sapply(s$mandate, function(x) {
-    sum(unlist(strsplit(x, ";")) <= ifelse(leg == 35, 2007, 2011))
+    sum(unlist(strsplit(x, ";")) <= substr(ii, 1, 4))
   })
   n %v% "nyears" = as.numeric(s[ network.vertex.names(n), "nyears" ])
   n %v% "constituency" = as.character(s[ network.vertex.names(n), "constituency" ])
   n %v% "photo" = as.character(gsub("photos/", "", s[ network.vertex.names(n), "photo" ]))
+  
+  n %v% "party_length" = as.numeric(s[ network.vertex.names(n), "party_length" ])
+  n %v% "constituency_length" = as.numeric(s[ network.vertex.names(n), "constituency_length" ])
 
   set.edge.attribute(n, "source", as.character(edges[, 1])) # cosponsor
   set.edge.attribute(n, "target", as.character(edges[, 2])) # first author
@@ -149,9 +152,9 @@ for(ii in 35:36) {
   # save objects
   #
   
-  assign(paste0("net_fi", ii), n)
-  assign(paste0("edges_fi", ii), edges)
-  assign(paste0("bills_fi", ii), data)
+  assign(paste0("net_fi", substr(ii, 1, 4)), n)
+  assign(paste0("edges_fi", substr(ii, 1, 4)), edges)
+  assign(paste0("bills_fi", substr(ii, 1, 4)), data)
   
   #
   # export gexf
@@ -163,7 +166,7 @@ for(ii in 35:36) {
 }
 
 if(gexf)
-  zip(paste0("net_fi.zip"), dir(pattern = "^net_fi\\d{2}\\.gexf$"))
+  zip(paste0("net_fi.zip"), dir(pattern = "^net_fi\\d{4}-\\d{4}\\.gexf$"))
 
-save(list = ls(pattern = "^(net|edges|bills)_fi\\d{2}$"),
+save(list = ls(pattern = "^(net|edges|bills)_fi\\d{4}-\\d{4}$"),
      file = "data/net_fi.rda")

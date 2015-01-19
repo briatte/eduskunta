@@ -43,7 +43,7 @@ The Eduskunta website uses a _very_ strange URL system: two URLs are necessary t
 
 If the URL at [line 110]() in `data.r` fails to work (which is almost certainly going to be the case):
 
-- visit [this index page](http://www.eduskunta.fi/thwfakta/hetekau/hex/hxent.htm)
+- visit [this index page](http://www.eduskunta.fi/triphome/bin/hx3000.sh?{haku}=kaikki&LAJITNIMI=$)
 - extract the string stored into the `THWIDS` parameter when clicking 'Next page' (_Seuraava_ at the bottom-right of the page; copy the URL to the clipboard to view it)
 - remove the part before the first period, which should be `100`
 - replace the string `.21/1421346561_16245` on line 110 with the new string
