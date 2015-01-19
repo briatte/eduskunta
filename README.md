@@ -33,6 +33,7 @@ The `build.r` script then assembles the edge lists and plots the networks, with 
 - `name_full` -- sponsor full name (same as in bills data)
 - `born` -- year of birth
 - `party` -- political party, abbreviated
+- `constituency` -- constituency, stored as the string to its Wikipedia Suomi entry
 - `partyname` -- political party, full name
 - `party_length` -- number of political parties the sponsor has belonged to
 - `mandate` -- semicolon-separated years of mandate, used to compute the `nyears` seniority variable
