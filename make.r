@@ -20,5 +20,6 @@ gexf = TRUE
 
 source("data.r")  # scrape bills and sponsors
 source("build.r") # assemble the networks
+source("comm.r")  # add committees covariates
 
 # have a nice day
