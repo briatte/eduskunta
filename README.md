@@ -1,7 +1,8 @@
 This repository contains code to build cosponsorship networks from bills (and motions) passed in the [Finnish Parliament](http://www.eduskunta.fi/).
 
-- [interactive demo](http://briatte.org/eduskunta)
-- [static plots](http://briatte.org/eduskunta/plots.html)
+- [interactive demo](http://f.briatte.org/parlviz/eduskunta)
+- [static plots](http://f.briatte.org/parlviz/eduskunta/plots.html)
+- [more countries](https://github.com/briatte/parlnet)
 
 For related work, see the [`finpar`](https://github.com/rOpenGov/finpar) package.
 
