@@ -115,6 +115,8 @@ b$authors = gsub("Merikukka Forsius-Harkimo", "Merikukka Forsius", b$authors)
 b$authors = gsub("Miapetra Kumpula(-Natri)?", "Miapetra Kumpula-Natri", b$authors)
 b$authors = gsub("Riikka Moilanen-Savolainen", "Riikka Moilanen", b$authors)
 
+b$year = substr(b$url, nchar(b$url) - 3, nchar(b$url))
+
 a = unlist(strsplit(b$authors, ";"))
 a = a[ !is.na(a) ]
 
