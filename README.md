@@ -43,7 +43,7 @@ The `build.r` script then assembles the edge lists and plots the networks, with 
 
 The Eduskunta website uses a _very_ strange URL system: two URLs are necessary to scrape the sponsors, which explains the four different URL variables (two for the sponsor profile, one for the original photo URL and one for the shortened version).
 
-If the URL at [line 110](data.r#L110) in `data.r` fails to work (which is almost certainly going to be the case):
+If the URL at [line 132](data.r#L132) in `data.r` fails to work (which is almost certainly going to be the case):
 
 - visit [this index page](http://www.eduskunta.fi/triphome/bin/hx3000.sh?{haku}=kaikki&LAJITNIMI=$)
 - extract the string stored into the `THWIDS` parameter when clicking 'Next page' (_Seuraava_ at the bottom-right of the page; copy the URL to the clipboard to view it)
