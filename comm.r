@@ -4,7 +4,7 @@ load("data/net_fi.rda")
 sponsors = dir("raw", pattern = "mp-(.*)\\.htm$", full.names = TRUE)
 raw = data.frame()
 
-for(i in sponsors) {
+for (i in sponsors) {
   
   h = htmlParse(i, encoding = "UTF-8")
   n = c(xpathSApply(h, "//font[contains(text(), 'toimieli')]/../../..//li[contains(text(), 'kunta')]", xmlValue),
@@ -13,8 +13,8 @@ for(i in sponsors) {
         xpathSApply(h, "//font[contains(text(), 'toimieli')]/../../..//a[contains(text(), 'kunnan')]", xmlValue))
   n = unlist(n)
 
-  if(length(n))
-    raw = rbind(raw, data.frame(i, n, stringsAsFactors = FALSE))
+  if (length(n))
+    raw = rbind(raw, data_frame(i, n))
   
 }
 
@@ -31,26 +31,26 @@ write.csv(summarise(group_by(raw, n), members = n()),
 
 raw$i = gsub("raw/mp-", "", raw$i)
 
-comm = data.frame(u = unique(raw$n), stringsAsFactors = FALSE)
+comm = data_frame(u = unique(raw$n))
 
 # add sponsor columns
-for(i in sponsors)
+for (i in sponsors)
   comm[, gsub("raw/mp-", "", i) ] = 0
 
-for(i in colnames(comm)[ -1 ])
+for (i in colnames(comm)[ -1 ])
   comm[ , i ] = as.numeric(comm$u %in% raw$n[ raw$i == i ])
 
-stopifnot(gsub("/faktatmp/hetekatmp/", "", s$profile_url) %in% names(comm[, -1]))
+stopifnot(gsub(paste0(root, "/faktatmp/hetekatmp/"), "", s$profile_url) %in% names(comm[, -1]))
 
 # assign co-memberships to networks
-for(i in ls(pattern = "^net_")) {
+for (i in ls(pattern = "^net_")) {
   
   n = get(i)
   cat(i, ":", network.size(n), "nodes")
   
   sp = network.vertex.names(n)
   names(sp) = n %v% "url"
-  names(sp) = gsub("/faktatmp/hetekatmp/", "", names(sp))
+  names(sp) = gsub(paste0(root, "/faktatmp/hetekatmp/"), "", names(sp))
   
   stopifnot(names(sp) %in% colnames(comm))
   
@@ -67,12 +67,10 @@ for(i in ls(pattern = "^net_")) {
   colnames(m) = sp[ colnames(m) ]
   rownames(m) = sp[ rownames(m) ]
   
-  e = data.frame(i = n %e% "source",
-                 j = n %e% "target",
-                 stringsAsFactors = FALSE)
+  e = data_frame(i = n %e% "source", j = n %e% "target")
   e$committee = NA
   
-  for(j in 1:nrow(e))
+  for (j in 1:nrow(e))
     e$committee[ j ] = m[ e$i[ j ], e$j[ j ] ]
   
   cat(" co-memberships:",

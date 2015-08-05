@@ -13,6 +13,21 @@ colors = c(
   "M11"  = "#80B1D3"  # Muutos 2011                     -- light blue
 )
 
+groups = c(
+  "VR" = "Vasenryhmä",
+  "VAS" = "Vasemmistoliitto",
+  "VIHR" = "Vihreä liitto",
+  "SD" = "Sosialidemokraattinen Puolue",
+  "KESK" = "Keskusta",
+  "R" = "Ruotsalainen kansanpuolue",
+  "PS" = "Perussuomalaiset",
+  "KD" = "Kristillisdemokraatit",
+  "KOK" = "Kansallinen Kokoomus",
+  "M11" = "Muutos 2011"#,
+  #"KDL" = "Kansan Demokraattinen Liitto",
+  #"MP" = "Maaseudun Puolue",
+)
+
 # ParlGov Left/Right scores
 
 scores = c(
@@ -28,5 +43,5 @@ scores = c(
   "M11"  = Inf # missing
 )
 
+stopifnot(names(colors) == names(groups))
 stopifnot(names(colors) == names(scores))
-order = names(colors)[ order(scores) ]

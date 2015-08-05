@@ -1,7 +1,4 @@
-meta = c("Finland", "Eduskunta")
-mode = "fruchtermanreingold"
-
-for(ii in unique(b$legislature)) {
+for (ii in unique(b$legislature)) {
   
   cat("Legislature", ii)
   leg = substr(ii, 1, 4)
@@ -14,7 +11,7 @@ for(ii in unique(b$legislature)) {
   # check for missing sponsors
   u = unlist(strsplit(data$authors, ";"))
   u = na.omit(a[ !a %in% s$name ])
-  if(length(u)) {
+  if (length(u)) {
     cat("Missing", length(u), "sponsors:")
     print(table(u))
   }
@@ -60,10 +57,10 @@ for(ii in unique(b$legislature)) {
   edges = aggregate(w ~ ij, function(x) sum(1 / x), data = edges)
   
   # expand to edge list
-  edges = data.frame(i = gsub("(.*)///(.*)", "\\1", edges$ij),
+  edges = data_frame(i = gsub("(.*)///(.*)", "\\1", edges$ij),
                      j = gsub("(.*)///(.*)", "\\2", edges$ij),
                      raw = as.vector(raw[ edges$ij ]), # raw edge counts
-                     nfw = edges$w, stringsAsFactors = FALSE)
+                     nfw = edges$w)
   
   # Gross-Shalizi weights (weighted propensity to cosponsor)
   edges = merge(edges, aggregate(w ~ j, function(x) sum(1 / x), data = self))
@@ -83,9 +80,15 @@ for(ii in unique(b$legislature)) {
   
   n = network(edges[, 1:2 ], directed = TRUE)
 
-  n %n% "country" = meta[1]
-  n %n% "title" = paste(meta[2], paste0(range(unique(substr(data$year, 1, 4))),
-                                        collapse = " to "))
+  n %n% "country" = meta[ "cty" ] %>% as.character
+  n %n% "lang" = meta[ "lang" ] %>% as.character
+  n %n% "years" = ii
+  n %n% "legislature" = c("1999-2002" = "33", "2003-2006" = "34",
+                          "2007-2010" = "35", "2011-2014" = "36")[ as.character(ii) ]
+  n %n% "chamber" = meta[ "ch" ] %>% as.character
+  n %n% "type" = meta[ "type" ] %>% as.character
+  n %n% "ipu" = meta[ "ipu" ] %>% as.integer
+  n %n% "seats" = meta[ "seats" ] %>% as.integer
   
   n %n% "n_bills" = nrow(data)
   n %n% "n_sponsors" = table(subset(b, legislature == ii)$n_au)
@@ -100,26 +103,27 @@ for(ii in unique(b$legislature)) {
   
   cat(network.size(n), "nodes\n")
   
-  n %v% "url" = as.character(gsub("&", "&amp;", s[ network.vertex.names(n), "profile_url" ]))
-  n %v% "sex" = as.character(s[ network.vertex.names(n), "sex" ])
-  n %v% "born" = as.numeric(s[ network.vertex.names(n), "born" ])
-  n %v% "party" = as.character(s[ network.vertex.names(n), "party" ])
-  n %v% "partyname" = as.character(s[ network.vertex.names(n), "partyname" ])
+  # the URLs don't work any more...
+  n %v% "url" = s[ network.vertex.names(n), "profile_url" ]
+  n %v% "sex" = s[ network.vertex.names(n), "sex" ]
+  
+  # since the sponsors data contain some missing values, let's make sure all
+  # sponsors featured in the networks are covered by the manual imputations
+  stopifnot((n %v% "sex") %in% c("F", "M"))
+  
+  n %v% "born" = s[ network.vertex.names(n), "born" ]
+  n %v% "party" = s[ network.vertex.names(n), "party" ]
+  n %v% "partyname" = groups[ n %v% "party" ] %>% as.character
   n %v% "lr" = as.numeric(scores[ n %v% "party" ])
   s$nyears = sapply(s$mandate, function(x) {
     sum(unlist(strsplit(x, ";")) <= substr(ii, 1, 4))
   })
-  n %v% "nyears" = as.numeric(s[ network.vertex.names(n), "nyears" ])
-  n %v% "constituency" = as.character(s[ network.vertex.names(n), "constituency" ])
-  n %v% "photo" = as.character(gsub("photos/", "", s[ network.vertex.names(n), "photo" ]))
+  n %v% "nyears" = s[ network.vertex.names(n), "nyears" ] %>% as.integer
+  n %v% "constituency" = s[ network.vertex.names(n), "constituency" ]
+  n %v% "photo" = s[ network.vertex.names(n), "photo" ]
   
   n %v% "party_length" = as.numeric(s[ network.vertex.names(n), "party_length" ])
   n %v% "constituency_length" = as.numeric(s[ network.vertex.names(n), "constituency_length" ])
-
-  # unweighted degree
-  n %v% "degree" = degree(n)
-  q = n %v% "degree"
-  q = as.numeric(cut(q, unique(quantile(q)), include.lowest = TRUE))
 
   set.edge.attribute(n, "source", as.character(edges[, 1])) # cosponsor
   set.edge.attribute(n, "target", as.character(edges[, 2])) # first author
@@ -132,12 +136,12 @@ for(ii in unique(b$legislature)) {
   # network plot
   #
   
-  if(plot) {
+  if (plot) {
     
-    save_plot(n, file = paste0("plots/net_fi", ii),
-               i = colors[ s[ n %e% "source", "party" ] ],
-               j = colors[ s[ n %e% "target", "party" ] ],
-               q, colors, order)
+    save_plot(n, paste0("plots/net_fi", ii),
+              i = colors[ s[ n %e% "source", "party" ] ],
+              j = colors[ s[ n %e% "target", "party" ] ],
+              mode, colors)
             
   }
   
@@ -153,12 +157,12 @@ for(ii in unique(b$legislature)) {
   # export gexf
   #
   
-  if(gexf)
-    save_gexf(paste0("net_fi", ii), n, meta, mode, colors, extra = "constituency")
+  if (gexf)
+    save_gexf(n, paste0("net_fi", ii), mode, colors)
   
 }
 
-if(gexf)
+if (gexf)
   zip(paste0("net_fi.zip"), dir(pattern = "^net_fi\\d{4}-\\d{4}\\.gexf$"))
 
 save(list = ls(pattern = "^(net|edges|bills)_fi\\d{4}$"),

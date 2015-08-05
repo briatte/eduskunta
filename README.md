@@ -8,7 +8,7 @@ For related work, see the [`finpar`](https://github.com/rOpenGov/finpar) package
 
 # HOWTO
 
-__Important note:__ the scraper is currently broken due to a [website redesign](https://github.com/briatte/eduskunta/issues/1) that makes the search engine inaccessible for various projects, including this one. It is unlikely that this issue will get fixed in the near future, but please feel free to ask for the raw data collected for years 1999–2014.
+__Important note:__ the scraper is currently broken due to a [website redesign](https://github.com/briatte/eduskunta/issues/1) that makes the search engine inaccessible for various projects, including this one. It is unlikely that this issue will get fixed in the near future, but please feel free to ask for the raw data collected for years 1999–2014 (the code will process it without breaking).
 
 # DATA
 

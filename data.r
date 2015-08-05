@@ -4,10 +4,10 @@ root = "http://www.eduskunta.fi"
 bills = "data/bills.csv"
 sponsors = "data/sponsors_url.csv"
 
-if(!file.exists(bills)) {
+if (!file.exists(bills)) {
   
   b = data.frame()
-  for(y in c(# no parsable bills before 2000
+  for (y in c(# no parsable bills before 2000
     #"(1991+or+1992+or+1993+or+1994)",
     #"(1995+or+1996+or+1997+or+1998)", 
     "(1999+or+2000+or+2001+or+2002)", 
@@ -19,15 +19,15 @@ if(!file.exists(bills)) {
     cat("Adding years", r)
     
     file = paste0("raw/bills-", r, ".html")
-    if(!file.exists(file))
+    if (!file.exists(file))
       download.file(paste0("http://www.eduskunta.fi/triphome/bin/thw.cgi/trip/?${BASE}=veps7099&${CCL}=define+merge&${CCL}=define+thesa=vepstesa&${CCL}=define+view+saadkok=saadk,kv_saadk,sopimussarja,kv_sopimussarja&${FREETEXT}=vpvuosi=", y, "+and+tunniste=LA&${savehtml}=/triphome/bin/vexhaku.sh%3Flyh=%27%27%3Fkieli=su&${TRIPSHOW}=html=vex/vex4050+format=vex4050&${MAXPAGE}=901&${SORT}=LAJIT1,LAJIT2+DESC&${COMBOT}=0,2,0#alkukohta"),
                     file, quiet = TRUE, mode = "wb")
     
     h = htmlParse(file)
-    b = rbind(b, data.frame(
+    b = rbind(b, data_frame(
       legislature = r,
-      url = xpathSApply(h, "//a[contains(@href, '{KEY}=LA+')]/@href"),
-      stringsAsFactors = FALSE))
+      url = xpathSApply(h, "//a[contains(@href, '{KEY}=LA+')]/@href")
+    ))
 
     cat(":", sprintf("%4.0f", nrow(b)), "total bills\n")
     
@@ -40,16 +40,17 @@ b = read.csv(bills, stringsAsFactors = FALSE)
 b$authors = NA
 
 # parse bills (fails for years prior to 2000)
-for(i in rev(b$url)) {
+cat("Parsing", length(b$url), "bills...\n")
+for (i in rev(b$url)) {
   
   f = gsub("(.*)LA\\+(\\d+)/(\\d+)", "raw/bill-\\3-\\2.html", i)
   # cat(sprintf("%4.0f", which(b$url == i)), f)
   
-  if(!file.exists(f) & !grepl("bill-1999-", f)) {
+  if (!file.exists(f) & !grepl("bill-1999-", f)) {
     
     h = try(download.file(paste0(root, "/", i), f, mode = "wb", quiet = TRUE), silent = TRUE)
     
-    if("try-error" %in% class(h) | !file.info(f)$size) {
+    if ("try-error" %in% class(h) | !file.info(f)$size) {
       
       file.remove(f)
       cat(f, ": failed\n")
@@ -58,12 +59,12 @@ for(i in rev(b$url)) {
     
   }
   
-  if(file.exists(f)) {
+  if (file.exists(f)) {
     
     t = readLines(f, encoding = "iso-8859-1", warn = FALSE)
     a = which(grepl("name=\"ALLEKOSA\"", t, useBytes = TRUE))
     
-    if(length(a)) {
+    if (length(a)) {
       
       t = t[ 1 + a:length(t) ]
       t = t[ 1:which(grepl("</div>", t, useBytes = TRUE))[1] ]
@@ -76,7 +77,7 @@ for(i in rev(b$url)) {
       
     } else {
       
-      cat(f, ": empty\n")
+      # cat(f, ": empty\n")
       
     }
     
@@ -122,11 +123,11 @@ a = a[ !is.na(a) ]
 
 # scrape sponsors
 
-if(!file.exists(sponsors)) {
+if (!file.exists(sponsors)) {
   
   s = data.frame()
   
-  for(i in 24:0) {
+  for (i in 24:0) {
     
     cat(sprintf("%5.0f", i))
     h = htmlParse(paste0("http://www.eduskunta.fi/triphome/bin/thw/trip/?${MAXPAGE}=101&${APPL}=hetekaue&${BASE}=hetekaue&${HTML}=hex/hx4600&${THWIDS}=", 100 * i, ".21/1421346561_16245&${HILITE}=0#alkukohta"), encoding = "UTF-8")
@@ -135,7 +136,7 @@ if(!file.exists(sponsors)) {
     name = str_clean(gsub("&nbsp", "", name))
     year = xpathSApply(h, "//table[2]/tr/td[2]", xmlValue)
     year = str_clean(year[-1])
-    s = rbind(s, data.frame(url, name, year, stringsAsFactors = FALSE))
+    s = rbind(s, data_frame(url, name, year))
     cat(":", nrow(s), "total MPs\n")
     
   }
@@ -145,10 +146,10 @@ if(!file.exists(sponsors)) {
   
   # rerun to fix network errors or expand beyond str_extract limit
   l = s$url[ is.na(s$profile_url) & str_extract(s$year, "[0-9]{4}") >= 1970 ]
-  for(i in rev(l)) {
+  for (i in rev(l)) {
     cat(which(l == i))
     h = try(htmlParse(paste0(root, i)), silent = TRUE)
-    if(!"try-error" %in% class(h)) {
+    if (!"try-error" %in% class(h)) {
       s$photo_url[ s$url == i] = xpathSApply(h, "//frame[@name='vasen2']/@src")
       s$profile_url[ s$url == i] = xpathSApply(h, "//frame[@name='oikea2']/@src")
       cat("\n")
@@ -167,19 +168,19 @@ n = data.frame()
 # download and parse sponsors
 
 l = s$profile_url[ !is.na(s$profile_url) ]
-cat("Parsing", length(l), "sponsors\n")
-for(i in rev(l)) {
+cat("Parsing", length(l), "sponsors...\n")
+for (i in rev(l)) {
   
   f = gsub("/faktatmp/hetekatmp/", "raw/mp-", i)
   # cat(sprintf("%5.0f", which(l == i)), f)
   
-  if(!file.exists(f)) {
+  if (!file.exists(f)) {
     
     try(download.file(paste0(root, i), f, quiet = TRUE), silent = TRUE)
     
   }
   
-  if(!file.info(f)$size) {
+  if (!file.info(f)$size) {
     
     cat(": failed\n")
     file.remove(f)
@@ -202,7 +203,7 @@ for(i in rev(l)) {
     # dirtier method
     # party = str_clean(xpathSApply(h, "//font[contains(text(), 'Eduskuntaryhm')]/../../..", xmlValue))
     
-    if(!length(party))
+    if (!length(party))
       party = NA
     
     born = xpathSApply(h, "//font[contains(text(), 'Syntym')]/../../..", xmlValue)
@@ -210,9 +211,8 @@ for(i in rev(l)) {
     
     # cat(":", name, "\n")
     
-    n = rbind(n, data.frame(profile_url = i, name, born, party, party_length, 
-                            constituency, constituency_length, mandate,
-                            stringsAsFactors = FALSE))
+    n = rbind(n, data_frame(profile_url = i, name, born, party, party_length, 
+                            constituency, constituency_length, mandate))
     
   }
   
@@ -220,12 +220,31 @@ for(i in rev(l)) {
 
 table(n$constituency_length) # ~ 240 fixes needed, multiple constituencies
 
+# ==============================================================================
+# CHECK CONSTITUENCIES
+# ==============================================================================
+
 # convert constituencies to Wikipedia Suomi
 n$constituency = gsub("\\s", "_", n$constituency)
 n$constituency = gsub("_(eteläinen|läänin|kaupungin|pohjoinen)", "", n$constituency)
 n$constituency[ n$constituency == "Turun_vaalipiiri" ] = "Varsinais-Suomen_vaalipiiri"
 n$constituency[ n$constituency == "Mikkelin_vaalipiiri" ] = "Etelä-Savon_vaalipiiri"
 n$constituency[ n$constituency == "Kuopion_vaalipiiri" ] = "Pohjois-Savon_vaalipiiri"
+
+for (i in unique(n$constituency)) {
+  
+  g = GET(paste0("https://fi.wikipedia.org/wiki/", i))
+  
+  if (status_code(g) != 200)
+    cat("Missing Wikipedia entry:", i, "\n")
+  
+  g = xpathSApply(htmlParse(g), "//title", xmlValue)
+  g = gsub("(.*) – Wikipedia", "\\1", g)
+  
+  if (gsub("\\s", "_", g) != i)
+    cat("Discrepancy:", g, "(WP) !=", i ,"(data)\n")
+  
+}
 
 # all sponsors should be matched
 
@@ -261,21 +280,6 @@ n$party[ grepl("kansan demokraattisen liiton", n$party) ] = "kdl"
 # Suomen Maaseudun Puolue (SMP), right, 1959-1995, dark blue
 n$party[ grepl("maaseudun puolueen", n$party) ] = "mp"
 
-n$partyname = NA
-n$partyname[ n$party == "kd" ] = "Kristillisdemokraatit"
-n$partyname[ n$party == "kesk" ] = "Keskusta"
-n$partyname[ n$party == "kok" ] = "Kansallinen Kokoomus"
-n$partyname[ n$party == "m11" ] = "Muutos 2011"
-n$partyname[ n$party == "ps" ] = "Perussuomalaiset"
-n$partyname[ n$party == "r" ] = "Ruotsalainen kansanpuolue"
-n$partyname[ n$party == "sd" ] = "Sosialidemokraattinen Puolue"
-n$partyname[ n$party == "kdl" ] = "Kansan Demokraattinen Liitto"
-n$partyname[ n$party == "mp" ] = "Maaseudun Puolue"
-n$partyname[ n$party == "vas" ] = "Vasemmistoliitto"
-n$partyname[ n$party == "vihr" ] = "Vihreä liitto"
-n$partyname[ n$party == "vr" ] = "Vasenryhmä"
-
-table(n$partyname, exclude = NULL) # missing 16
 n$party = toupper(n$party)
 
 # convert mandates years
@@ -301,7 +305,7 @@ table(n$name[ !n$sex %in% c("F", "M") ])
 names(s)[ which(names(s) == "name") ] = "name_full"
 s = merge(s, n, by = "profile_url")
 
-if(!file.exists("data/sponsors.csv")) {
+if (!file.exists("data/sponsors.csv")) {
   
   s$photo = NA
   write.csv(s, "data/sponsors.csv", row.names = FALSE)
@@ -314,17 +318,17 @@ if(!file.exists("data/sponsors.csv")) {
 
 # download photos (sponsors only; rerun to solve network errors)
 l = unique(s$photo_url[ s$name %in% a & is.na(s$photo) ])
-for(i in rev(l)) {
+for (i in rev(l)) {
   
   cat("Checking photo", sprintf("%5.0f", which(l == i)))
   h = htmlParse(paste0(root, gsub("hx5000", "hx5100", i)))
   p = xpathSApply(h, "//img[contains(@src, 'jpg')]/@src")
   f = gsub("/fakta/edustaja/kuvat", "photos", p)
   
-  if(!file.exists(f))
+  if (!file.exists(f))
     try(download.file(paste0(root, p), f, quiet = TRUE, mode = "wb"), silent = TRUE)
   
-  if(!file.info(f)$size) {
+  if (!file.info(f)$size) {
     
     cat(": failed\n")
     file.remove(f)
@@ -340,6 +344,11 @@ for(i in rev(l)) {
 
 write.csv(s, "data/sponsors.csv", row.names = FALSE)
 
+# hack photo ID to filename (should happen during the download loop, but the
+# loop does not work any more, so that won't work for now)
+s$photo = paste0("photos/", s$photo, ".jpg")
+s$photo[ s$photo == "photos/NA.jpg" ] = NA
+
 # listing only parties represented in the cosponsorship data
 # dput(unique(subset(s, name %in% a)$party))
 
@@ -347,7 +356,33 @@ write.csv(s, "data/sponsors.csv", row.names = FALSE)
 s = unique(s)
 s = s[ -which(duplicated(s$profile_url)), ]
 
+# full profile URLs (invalid anyway...)
+s$profile_url = paste0(root, s$profile_url)
+
 # sponsor unique ids are names
 rownames(s) = s$name
+
+# ============================================================================
+# QUALITY CONTROL (sort of...)
+# ============================================================================
+
+# - might be missing: born (int of length 4), constituency (chr),
+#   photo (chr, folder/file.ext)
+# - never missing: sex (chr, F/M), nyears (int), url (chr, URL),
+#   party (chr, mapped to colors)
+
+cat("Missing", sum(is.na(s$born)), "years of birth\n")
+stopifnot(is.integer(s$born) & nchar(s$born) == 4 | is.na(s$born))
+
+cat("Missing", sum(is.na(s$constituency)), "constituencies\n")
+stopifnot(is.character(s$constituency))
+
+cat("Missing", sum(is.na(s$photo)), "photos\n")
+stopifnot(is.character(s$photo) & grepl("^photos(_\\w{2})?/(.*)\\.\\w{3}", s$photo) | is.na(s$photo))
+
+# stopifnot(!is.na(s$sex) & s$sex %in% c("F", "M")) ## some missing before 1999
+# stopifnot(!is.na(s$nyears) & is.integer(s$nyears)) ## computed on the fly
+stopifnot(!is.na(s$profile_url) & grepl("^http(s)?://(.*)", s$profile_url))
+# stopifnot(s$party %in% names(colors)) ## some are unidentified but not used
 
 # job's done

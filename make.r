@@ -15,6 +15,15 @@ dir.create("raw"    , showWarnings = FALSE)
 
 plot = TRUE
 gexf = TRUE
+mode = "fruchtermanreingold"
+meta = c(
+  "cty" = "Finland",
+  "lang" = "fi", # Wikipedia language for chamber and constituencies
+  "ch" = "Eduskunta",
+  "type" = "Unicameral",
+  "ipu" = 2111,
+  "seats" = 200
+)
 
 # build routine
 
