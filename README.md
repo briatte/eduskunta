@@ -8,11 +8,7 @@ For related work, see the [`finpar`](https://github.com/rOpenGov/finpar) package
 
 # HOWTO
 
-Replicate by running `make.r` in R.
-
-The `data.r` script downloads information on bills and sponsors. All photos should download fine.
-
-The `build.r` script then assembles the edge lists and plots the networks, with the help of a few routines coded into `functions.r`. Adjust the `plot`, `gexf` and `mode` parameters to skip the plots or to change the node placement algorithm.
+__Important note:__ the scraper is currently broken due to a [website redesign](https://github.com/briatte/eduskunta/issues/1) that makes the search engine inaccessible for various projects, including this one. It is unlikely that this issue will get fixed in the near future, but please feel free to ask for the raw data collected for years 1999–2014.
 
 # DATA
 
