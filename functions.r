@@ -53,10 +53,7 @@ save_gexf <- function(n, name, mode, colors) {
                          description = paste("legislative cosponsorship network,",
                                              mode, "placement,",
                                              n %n% "n_cosponsored", "bills"),
-                         keywords = paste0(c("parliament",
-                                             tolower(n %n% "country"),
-                                             tolower(n %n% "chamber")),
-                                           collapse = ", ")),
+                         keywords = paste("parliament,", tolower(n %n% "country"))),
              output = paste0(name, ".gexf"))
   
 }
