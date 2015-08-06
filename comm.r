@@ -1,15 +1,17 @@
 # add committee co-memberships
 
-sponsors = dir("raw", pattern = "mp-(.*)\\.htm$", full.names = TRUE)
+sponsors = list.files("raw", pattern = "mp-(.*)\\.htm$", full.names = TRUE)
 raw = data.frame()
 
 for (i in sponsors) {
   
   h = htmlParse(i, encoding = "UTF-8")
-  n = c(xpathSApply(h, "//font[contains(text(), 'toimieli')]/../../..//li[contains(text(), 'kunta')]", xmlValue),
-        xpathSApply(h, "//font[contains(text(), 'toimieli')]/../../..//li[contains(text(), 'kunnan')]", xmlValue),
-        xpathSApply(h, "//font[contains(text(), 'toimieli')]/../../..//a[contains(text(), 'kunta')]", xmlValue),
-        xpathSApply(h, "//font[contains(text(), 'toimieli')]/../../..//a[contains(text(), 'kunnan')]", xmlValue))
+  n = c(
+    xpathSApply(h, "//font[contains(text(), 'toimieli')]/../../..//li[contains(text(), 'kunta')]", xmlValue),
+    xpathSApply(h, "//font[contains(text(), 'toimieli')]/../../..//li[contains(text(), 'kunnan')]", xmlValue),
+    xpathSApply(h, "//font[contains(text(), 'toimieli')]/../../..//a[contains(text(), 'kunta')]", xmlValue),
+    xpathSApply(h, "//font[contains(text(), 'toimieli')]/../../..//a[contains(text(), 'kunnan')]", xmlValue)
+  )
   n = unlist(n)
 
   if (length(n))
@@ -42,7 +44,7 @@ for (i in colnames(comm)[ -1 ])
 stopifnot(gsub(paste0(root, "/faktatmp/hetekatmp/"), "", s$profile_url) %in% names(comm[, -1]))
 
 # assign co-memberships to networks
-for (i in ls(pattern = "^net_")) {
+for (i in ls(pattern = "^net_fi")) {
   
   n = get(i)
   cat(i, ":", network.size(n), "nodes")
