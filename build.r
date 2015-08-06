@@ -16,9 +16,9 @@ for (ii in unique(b$legislature)) {
     print(table(u))
   }
   
-  #
-  # directed edge list
-  #
+  # ============================================================================
+  # DIRECTED EDGE LIST
+  # ============================================================================
   
   edges = bind_rows(lapply(data$authors, function(d) {
     
@@ -31,9 +31,9 @@ for (ii in unique(b$legislature)) {
     
   }))
   
-  #
-  # edge weights
-  #
+  # ============================================================================
+  # EDGE WEIGHTS
+  # ============================================================================
   
   # first author self-loops, with counts of cosponsors
   self = subset(edges, i == j)
@@ -74,9 +74,9 @@ for (ii in unique(b$legislature)) {
   
   cat(nrow(edges), "edges, ")
   
-  #
-  # directed network
-  #
+  # ============================================================================
+  # DIRECTED NETWORK
+  # ============================================================================
   
   n = network(edges[, 1:2 ], directed = TRUE)
 
@@ -92,8 +92,13 @@ for (ii in unique(b$legislature)) {
   
   n %n% "n_bills" = nrow(data)
   n %n% "n_sponsors" = table(subset(b, legislature == ii)$n_au)
-  
+
+  # ============================================================================
+  # VERTEX-LEVEL ATTRIBUTES
+  # ============================================================================
+
   n_au = as.vector(n_au[ network.vertex.names(n) ])
+
   n %v% "n_au" = ifelse(is.na(n_au), 0, n_au)
   
   n_co = as.vector(n_co[ network.vertex.names(n) ])
@@ -132,9 +137,9 @@ for (ii in unique(b$legislature)) {
   set.edge.attribute(n, "nfw", edges$nfw) # Newman-Fowler weights
   set.edge.attribute(n, "gsw", edges$gsw) # Gross-Shalizi weights
   
-  #
-  # network plot
-  #
+  # ============================================================================
+  # SAVE PLOTS
+  # ============================================================================
   
   if (plot) {
     
@@ -145,17 +150,17 @@ for (ii in unique(b$legislature)) {
             
   }
   
-  #
-  # save objects
-  #
+  # ============================================================================
+  # SAVE OBJECTS
+  # ============================================================================
   
   assign(paste0("net_fi", substr(ii, 1, 4)), n)
   assign(paste0("edges_fi", substr(ii, 1, 4)), edges)
   assign(paste0("bills_fi", substr(ii, 1, 4)), data)
   
-  #
-  # export gexf
-  #
+  # ============================================================================
+  # SAVE GEXF
+  # ============================================================================
   
   if (gexf)
     save_gexf(n, paste0("net_fi", ii), mode, colors)
@@ -164,6 +169,3 @@ for (ii in unique(b$legislature)) {
 
 if (gexf)
   zip(paste0("net_fi.zip"), dir(pattern = "^net_fi\\d{4}-\\d{4}\\.gexf$"))
-
-save(list = ls(pattern = "^(net|edges|bills)_fi\\d{4}$"),
-     file = "data/net_fi.rda")

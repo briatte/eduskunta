@@ -39,4 +39,7 @@ source("data.r")  # scrape bills and sponsors
 source("build.r") # assemble the networks
 source("comm.r")  # add committees covariates
 
+save(list = ls(pattern = "^(co)?(net|edges|bills)_fi\\d{4}$"),
+     file = "data/net_fi.rda")
+
 # have a nice day
