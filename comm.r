@@ -1,7 +1,7 @@
 # add committee co-memberships
 
 sponsors = list.files("raw", pattern = "mp-(.*)\\.htm$", full.names = TRUE)
-raw = data.frame()
+raw = data_frame()
 
 for (i in sponsors) {
   
