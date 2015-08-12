@@ -17,7 +17,7 @@ dir.create("photos", showWarnings = FALSE)
 if (file.exists("raw.zip"))
   unzip("raw.zip")
 
-dir.create("raw"    , showWarnings = FALSE)
+dir.create("raw", showWarnings = FALSE)
 
 # parameters
 
